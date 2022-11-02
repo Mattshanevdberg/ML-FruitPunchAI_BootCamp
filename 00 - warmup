@@ -1,1 +1,5 @@
+git rm -r 00 - warmup
 
+git commit -m "Remove duplicated directory"
+
+git push origin <main>
