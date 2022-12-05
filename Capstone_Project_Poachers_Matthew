@@ -1,0 +1,346 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyMYRugMcxSH60LCQXq/pyS5",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/Mattshanevdberg/ML-FruitPunchAI_BootCamp/blob/main/Capstone_Project_Poachers_Matthew\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# importing required libraries \n",
+        "import tensorflow as tf \n",
+        "# from tensorflow.keras import Model, Input \n",
+        "# from tensorflow.keras.layers import Conv2D, Dense, Flatten, MaxPooling2D, BatchNormalization, Dropout, Rescaling\n",
+        "# from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping\n",
+        "import cv2\n",
+        "# import numpy as np \n",
+        "# import matplotlib.pyplot as plt\n",
+        "import os \n",
+        "from google_drive_downloader import GoogleDriveDownloader as gdd \n",
+        "# import shutil\n",
+        "#import gdown\n",
+        "from numpy import load\n",
+        "\n",
+        "# setting random seeds \n",
+        "# np.random.seed(0)\n",
+        "# tf.random.set_seed(0)\n",
+        "# os.environ['TF_DETERMINISTIC_OPS'] = '1'\n",
+        "\n",
+        "# print tensorflow version\n",
+        "# tf.__version__"
+      ],
+      "metadata": {
+        "id": "e2x65115pv0D"
+      },
+      "execution_count": 16,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "#DOWNLOAD DATA"
+      ],
+      "metadata": {
+        "id": "3F1uvE35BBV8"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "## Method used in the actual challenge"
+      ],
+      "metadata": {
+        "id": "_OLeWPPwDUCq"
+      }
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 2,
+      "metadata": {
+        "id": "Dn9K6v9JL41_"
+      },
+      "outputs": [],
+      "source": [
+        "# downloading the classification dataset from google drive \n",
+        "url='https://drive.google.com/file/d/1EqPczd5IbO7tdqnV2zQWKesLACpZUlQl/view?usp=sharing'\n",
+        "file_id = url.split('/')[-2]\n",
+        "gdd.download_file_from_google_drive(file_id=file_id, dest_path='/content/classification_dataset.zip', unzip=True)"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# specifying folderpaths for train, val, test folders for poachers and no_poachers\n",
+        "folderpath_train = '/content/classification_dataset/Labeled data/images/train'\n",
+        "folderpath_val   = '/content/classification_dataset/images/val'\n",
+        "#folderpath_test  = '/content/classification_dataset/test/'\n",
+        "# folderpath_train_poachers   = os.path.join(folderpath_train,'poacher_images')\n",
+        "# folderpath_train_nopoachers = os.path.join(folderpath_train,'no_poacher_images')\n",
+        "# folderpath_val_poachers     = os.path.join(folderpath_val,'poacher_images')\n",
+        "# folderpath_val_nopoachers   = os.path.join(folderpath_val,'no_poacher_images')\n",
+        "# folderpath_test_poachers    = os.path.join(folderpath_test,'poacher_images')\n",
+        "# folderpath_test_nopoachers  = os.path.join(folderpath_test,'no_poacher_images')\n",
+        "\n",
+        "# printing file counts \n",
+        "print(len(os.listdir('/content/classification_dataset/')), 'trainset images' )\n",
+        "# print(len(os.listdir(folderpath_train_nopoachers)), 'trainset without poacher images')\n",
+        "# print(len(os.listdir(folderpath_val_poachers)), 'valset poacher images' )\n",
+        "# print(len(os.listdir(folderpath_val_nopoachers)), 'valset without poacher images')\n",
+        "# print(len(os.listdir(folderpath_test_poachers)), 'testset poacher images' )\n",
+        "# print(len(os.listdir(folderpath_test_nopoachers)), 'testset without poacher images')"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 235
+        },
+        "id": "YW-xlDo_6tXT",
+        "outputId": "58710cdd-22d1-48d9-98cd-a3e3616d5492"
+      },
+      "execution_count": 5,
+      "outputs": [
+        {
+          "output_type": "error",
+          "ename": "FileNotFoundError",
+          "evalue": "ignored",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mFileNotFoundError\u001b[0m                         Traceback (most recent call last)",
+            "\u001b[0;32m<ipython-input-5-c802ceb564a6>\u001b[0m in \u001b[0;36m<module>\u001b[0;34m\u001b[0m\n\u001b[1;32m     11\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     12\u001b[0m \u001b[0;31m# printing file counts\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 13\u001b[0;31m \u001b[0mprint\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mlen\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mos\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mlistdir\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m'/content/classification_dataset/'\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m'trainset images'\u001b[0m \u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     14\u001b[0m \u001b[0;31m# print(len(os.listdir(folderpath_train_nopoachers)), 'trainset without poacher images')\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     15\u001b[0m \u001b[0;31m# print(len(os.listdir(folderpath_val_poachers)), 'valset poacher images' )\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;31mFileNotFoundError\u001b[0m: [Errno 2] No such file or directory: '/content/classification_dataset/'"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "## Trying this method again but not with a zip file"
+      ],
+      "metadata": {
+        "id": "P3fs2iuMA0Kd"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#Test Image Data \n",
+        "#https://drive.google.com/drive/folders/1RyZ8N-yrIq_GwA2nGylq2arvKq97_Q-U?usp=share_link\n",
+        "# #download the data\n",
+        "\n",
+        "# !gdown --id 1RyZ8N-yrIq_GwA2nGylq2arvKq97_Q-U\n",
+        "\n",
+        "# # #https://drive.google.com/file/d/1Ger_cgbqilVW6K6xXlYGcNQBzn1YBFf8/view?usp=sharing\n",
+        "\n",
+        "file_id = \"1RyZ8N-yrIq_GwA2nGylq2arvKq97_Q-U\"\n",
+        "gdown.download(\n",
+        "    f\"https://drive.google.com/uc?export=download&confirm=pbef&id={file_id}\"\n",
+        ")"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "J40oYS47si_a",
+        "outputId": "78050128-41db-42bd-e22c-7eb730d6e41e"
+      },
+      "execution_count": 14,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Access denied with the following error:\n"
+          ]
+        },
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "\n",
+            " \tCannot retrieve the public link of the file. You may need to change\n",
+            "\tthe permission to 'Anyone with the link', or have had many accesses. \n",
+            "\n",
+            "You may still be able to access the file from the browser:\n",
+            "\n",
+            "\t https://drive.google.com/uc?export=download&confirm=pbef&id=1RyZ8N-yrIq_GwA2nGylq2arvKq97_Q-U \n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# train = load('/content/Labeled data-20211126T095740Z-001.zip')"
+      ],
+      "metadata": {
+        "id": "F9Wpfl2mvYhO"
+      },
+      "execution_count": 3,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# train_X = []\n",
+        "# train_X = train['Labeled data/images/train/video53_1_003468.PNG']\n",
+        "# train_X[0:5]\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "_E9Wp2YW1BEu",
+        "outputId": "bf8c8581-15ef-424f-f6f6-292ea9991809"
+      },
+      "execution_count": 34,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "b'\\x89PNG\\r'"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 34
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "## Attempting to download dataset again...(method 3 - from the internet)"
+      ],
+      "metadata": {
+        "id": "8mr_lQAg_uaj"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import os\n",
+        "import sys\n",
+        "from pycocotools.coco import COCO\n",
+        "import urllib\n",
+        "import zipfile"
+      ],
+      "metadata": {
+        "id": "hAlizQ6V_sLD"
+      },
+      "execution_count": 7,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# don't need to do this step as we already have the file\n",
+        "market1501_url = 'http://188.138.127.15:81/Datasets/Market-1501-v15.09.15.zip'\n",
+        "urllib.request.urlretrieve(market1501_url , filename = 'market1501.zip' )"
+      ],
+      "metadata": {
+        "id": "-Y97G2lF_-uj"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "with zipfile.ZipFile('/content/Labeled data-20211126T095740Z-001.zip' , 'r') as zip_ref:\n",
+        "    zip_ref.extractall()"
+      ],
+      "metadata": {
+        "id": "wAZDTOIUAKoV"
+      },
+      "execution_count": 8,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# PUTTING DATA INTO ARRAYS"
+      ],
+      "metadata": {
+        "id": "Xn1a-rCWBsEF"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "folder_path_train_images = '/content/Labeled_data/images/train/'\n",
+        "print(len(os.listdir(folder_path_train_images)), 'trainset poacher images' )\n",
+        "\n",
+        "folder_path_val_images = '/content/Labeled_data/images/val'\n",
+        "print(len(os.listdir(folder_path_val_images)), 'valset poacher images' )\n",
+        "\n",
+        "folder_path_test_images = '/content/Labeled_data/images'\n",
+        "print(len(os.listdir(folder_path_test_images)), 'test poacher images' )\n",
+        "\n",
+        "#attempt to convert files to png instead of PNG\n",
+        "files = os.listdir(folder_path_train_images)\n",
+        "for filename in files:\n",
+        "    file_wo_ext, file_ext = os.path.splitext(filename)\n",
+        "    if file_ext == \".PNG\":\n",
+        "        newfile = file_wo_ext + \".png\"\n",
+        "        os.rename(folder_path_train_images+filename, folder_path_train_images+newfile)\n",
+        "\n",
+        "#THis is how they did it in the actual lab but it doesn't seem to work here\n",
+        "image_size = (256, 256)\n",
+        "batch_size = 64\n",
+        "\n",
+        "print('train_ds')\n",
+        "train_ds = tf.keras.utils.image_dataset_from_directory(\n",
+        "    labels=None,\n",
+        "    directory=folder_path_train_images,\n",
+        "    batch_size=batch_size,\n",
+        "    color_mode = 'grayscale'\n",
+        ")\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "JuMp3LSYBymr",
+        "outputId": "c663e653-a8ca-4ef1-875e-b94026d8f310"
+      },
+      "execution_count": 31,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "7904 trainset poacher images\n",
+            "3278 valset poacher images\n",
+            "1902 test poacher images\n",
+            "train_ds\n",
+            "Found 7904 files belonging to 1 classes.\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
